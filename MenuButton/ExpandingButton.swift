@@ -26,6 +26,11 @@ class ExpandingButton: UIView, UIGestureRecognizerDelegate {
     private var trailingButton: NSLayoutConstraint?
     private var bottomButton: NSLayoutConstraint?
     private var topButton: NSLayoutConstraint?
+    private var menuItemMargin: CGFloat = 16.0
+    
+    lazy var animator: UIDynamicAnimator = {
+        return UIDynamicAnimator(referenceView: self)
+    }()
     
     
     var backgroundViewColor: UIColor = UIColor.grayColor() {
@@ -33,7 +38,7 @@ class ExpandingButton: UIView, UIGestureRecognizerDelegate {
             backView.backgroundColor = backgroundViewColor
         }
     }
-    var backgroundViewAlpha: CGFloat = 0.7
+    var backgroundViewAlpha: CGFloat = 0.5
     var centerButtonImage: UIImage {
         didSet{
             centerButton.setBackgroundImage(centerButtonImage, forState: .Normal)
@@ -98,6 +103,53 @@ class ExpandingButton: UIView, UIGestureRecognizerDelegate {
         UIView.animateWithDuration(0.4, animations: {
             self.backView.alpha = self.backgroundViewAlpha
         })
+        var lastItemY: CGFloat = defaultCenter.y
+        let animTime = 0.1
+        let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(3 * Double(NSEC_PER_SEC)))
+//       // dispatch_after(delayTime, dispatch_get_main_queue()) {
+//            let button = self.itemsArr[0]
+//            button.center = self.defaultCenter
+//            self.insertSubview(button, belowSubview: self.centerButton)
+//            
+//            let newYCoordinate = 250 - self.menuItemMargin - button.frame.size.height
+//            let newItemPoint = CGPointMake(self.defaultCenter.x, newYCoordinate)
+//            
+//            let snap = UISnapBehavior(item: button, snapToPoint: newItemPoint)
+//            self.animator.addBehavior(snap)
+//    //    }
+//        
+
+        
+        for (index, item) in itemsArr.enumerate() {
+            print(item.frame)
+            
+            print(item.center)
+            
+            item.center = defaultCenter
+            insertSubview(item, belowSubview: centerButton)
+            
+            let newYCoordinate = lastItemY - menuItemMargin - item.frame.size.height
+            let newItemPoint = CGPointMake(self.defaultCenter.x, newYCoordinate)
+
+            
+            print(item.center)
+            print(newItemPoint)
+//            UIView.animateWithDuration(animTime * Double(index+1), delay: 0, usingSpringWithDamping: 0.2, initialSpringVelocity: 5, options: .CurveLinear, animations: {
+//                item.center = CGPointMake(self.defaultCenter.x, newYCoordinate)
+//                }, completion: nil)
+            let snap = UISnapBehavior(item: item, snapToPoint: newItemPoint)
+       //     snap.damping = 0.3
+            animator.addBehavior(snap)
+//            UIView.animateWithDuration(animTime * Double(index) * 5, animations: {
+//
+//               item.center = CGPointMake(self.defaultCenter.x, newYCoordinate)
+//            })
+            
+            
+            
+            lastItemY = newYCoordinate
+        }
+        
         isExpanded = true
     }
     

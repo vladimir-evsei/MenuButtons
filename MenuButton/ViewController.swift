@@ -17,6 +17,7 @@ class ViewController: UIViewController, ExpandingButtonDelegate {
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
+    var expandingButton: ExpandingButton?
     
     var leadingExpButtonConstr:NSLayoutConstraint?
     var bottomExpButtonConstr:NSLayoutConstraint?
@@ -31,6 +32,7 @@ class ViewController: UIViewController, ExpandingButtonDelegate {
         menuButton.parentView = self.view
         positionButton()
         positionExpandingButton()
+        addItemsToExpandingMenu()
         menuButton.triggerButton.addTarget(self, action: #selector(menuButtonPressed(_:)), forControlEvents: .TouchUpInside)
     }
 
@@ -46,6 +48,31 @@ class ViewController: UIViewController, ExpandingButtonDelegate {
         let yConstr = NSLayoutConstraint.constraintsWithVisualFormat("V:[button(50)]-20-|", options: [], metrics: nil, views: views)
         view.addConstraints(xConstr)
         view.addConstraints(yConstr)
+    }
+    
+    private func addItemsToExpandingMenu() {
+        guard let expButton = expandingButton else{
+            return
+        }
+        let itemSize = CGSizeMake(40, 40)
+        if let image1 = UIImage(named: "chooser-moment-icon-music"){
+            let expItem1 = ExpandingItem(size: itemSize, frontImage: image1) {
+                print("button-tab ACTION")
+            }
+            expButton.insertNewItem(expItem1)
+        }
+        if let image2 = UIImage(named: "chooser-moment-icon-sleep"){
+            let expItem2 = ExpandingItem(size: itemSize, frontImage: image2) {
+                print("button-tab ACTION")
+            }
+            expButton.insertNewItem(expItem2)
+        }
+        if let image3 = UIImage(named: "chooser-moment-icon-thought") {
+            let expItem3 = ExpandingItem(size: itemSize, frontImage: image3) {
+                print("button-tab ACTION")
+            }
+             expButton.insertNewItem(expItem3)
+        }
     }
     
     private func positionExpandingButton() {
@@ -81,7 +108,7 @@ class ViewController: UIViewController, ExpandingButtonDelegate {
         
         trailingExpButtonConstr = expButton.trailingAnchor.constraintEqualToAnchor(view.trailingAnchor)
         topExpButtonConstr = expButton.topAnchor.constraintEqualToAnchor(view.topAnchor)
-        
+        expandingButton = expButton
     }
     
     func menuButtonPressed(sender: UIButton) {
