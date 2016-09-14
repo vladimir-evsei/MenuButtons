@@ -14,7 +14,7 @@ protocol ExpandingButtonDelegate {
     func willDismissMenuItems()
 }
 
-class ExpandingButton: UIView, UIGestureRecognizerDelegate {
+class ExpandingButton: UIView, UIGestureRecognizerDelegate, UIDynamicAnimatorDelegate {
     
     private var defaultCenter: CGPoint = CGPointZero
     private let backViewSize = UIScreen.mainScreen().bounds.size
@@ -29,7 +29,10 @@ class ExpandingButton: UIView, UIGestureRecognizerDelegate {
     private var menuItemMargin: CGFloat = 16.0
     
     lazy var animator: UIDynamicAnimator = {
-        return UIDynamicAnimator(referenceView: self)
+        var animator = UIDynamicAnimator(referenceView: self)
+//        animator.elapsedTime = 1
+        animator.delegate = self
+        return animator
     }()
     
     
@@ -105,13 +108,12 @@ class ExpandingButton: UIView, UIGestureRecognizerDelegate {
         var lastItemY: CGFloat = defaultCenter.y
         
         for (_, item) in itemsArr.enumerate() {
-            print(item.frame)
-            
-            print(item.center)
+//            print(item.frame)
+//            
+//            print(item.center)
             
             item.center = defaultCenter
             insertSubview(item, belowSubview: centerButton)
-            
             let newYCoordinate = lastItemY - menuItemMargin - item.frame.size.height
             let newItemPoint = CGPointMake(self.defaultCenter.x, newYCoordinate)
             let snap = UISnapBehavior(item: item, snapToPoint: newItemPoint)
@@ -123,15 +125,25 @@ class ExpandingButton: UIView, UIGestureRecognizerDelegate {
     }
     
     private func hideMenuItems() {
-        UIView.animateWithDuration(1, animations: {
+        userInteractionEnabled = false
+        animator.removeAllBehaviors()
+//        animator.delegate = self
+        itemsArr = itemsArr.map { item in
+            item.frame.origin = CGPointZero
+            item.removeFromSuperview()
+            return item
+        }
+        UIView.animateWithDuration(0.2, animations: {
             self.backView.alpha = 0
             }) { (_) in
                 self.backView.removeFromSuperview()
                 self.topButton?.constant = 0
                 self.leadingButton?.constant = 0
                 self.delegate?.willDismissMenuItems()
+                self.userInteractionEnabled = true
         }
         isExpanded = false
+        
     }
     
     //MARK: - Actions
@@ -155,5 +167,14 @@ class ExpandingButton: UIView, UIGestureRecognizerDelegate {
     
     func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldBeRequiredToFailByGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return true
+    }
+    //MARK: - UIDynamicAnimatorDelegate
+    func dynamicAnimatorWillResume(animator: UIDynamicAnimator){
+        print(animator.elapsedTime())
+        centerButton.userInteractionEnabled = false
+    }
+    func dynamicAnimatorDidPause(animator: UIDynamicAnimator) {
+        print(animator.elapsedTime())
+        centerButton.userInteractionEnabled = true
     }
 }

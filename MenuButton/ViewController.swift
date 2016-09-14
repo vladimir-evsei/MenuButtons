@@ -8,7 +8,6 @@
 
 import UIKit
 
-let leadingExpButtonConstant: CGFloat = 20
 let trailingExpButtonConstant: CGFloat = -20
 let bottomExpButtonConstant: CGFloat = -20
 class ViewController: UIViewController, ExpandingButtonDelegate {
@@ -62,17 +61,17 @@ class ViewController: UIViewController, ExpandingButtonDelegate {
         view.addSubview(expButton)
         expButton.translatesAutoresizingMaskIntoConstraints = false
         
-        leadingExpButtonConstr = expButton.leadingAnchor.constraintEqualToAnchor(view.leadingAnchor, constant: leadingExpButtonConstant)
+        trailingExpButtonConstr = expButton.trailingAnchor.constraintEqualToAnchor(view.trailingAnchor, constant: trailingExpButtonConstant)
         bottomExpButtonConstr = expButton.bottomAnchor.constraintEqualToAnchor(view.bottomAnchor, constant: bottomExpButtonConstant)
         heightExpButtonConstr = expButton.heightAnchor.constraintEqualToConstant(38)
         widthExpButtonConstr = expButton.widthAnchor.constraintEqualToConstant(38)
         
-        leadingExpButtonConstr?.active = true
+        trailingExpButtonConstr?.active = true
         bottomExpButtonConstr?.active = true
         heightExpButtonConstr?.active = true
         widthExpButtonConstr?.active = true
         
-        trailingExpButtonConstr = expButton.trailingAnchor.constraintEqualToAnchor(view.trailingAnchor)
+        leadingExpButtonConstr = expButton.leadingAnchor.constraintEqualToAnchor(view.leadingAnchor)
         topExpButtonConstr = expButton.topAnchor.constraintEqualToAnchor(view.topAnchor)
         expandingButton = expButton
     }    
@@ -81,19 +80,20 @@ class ViewController: UIViewController, ExpandingButtonDelegate {
     func willPresentMenuItems() {
         heightExpButtonConstr?.active = false
         widthExpButtonConstr?.active = false
-        leadingExpButtonConstr?.constant = 0
+        trailingExpButtonConstr?.constant = 0
+        
         bottomExpButtonConstr?.constant = 0
-        trailingExpButtonConstr?.active = true
+        leadingExpButtonConstr?.active = true
         topExpButtonConstr?.active = true
         
     }
     
     func willDismissMenuItems() {
-        trailingExpButtonConstr?.active = false
+        leadingExpButtonConstr?.active = false
         topExpButtonConstr?.active = false
         heightExpButtonConstr?.active = true
         widthExpButtonConstr?.active = true
-        leadingExpButtonConstr?.constant = leadingExpButtonConstant
+        trailingExpButtonConstr?.constant = trailingExpButtonConstant
         bottomExpButtonConstr?.constant = bottomExpButtonConstant
     }
 }
